@@ -2,27 +2,24 @@
 - name: install vault
   sudo: yes
   yum:
-    name: "https://bintray.com/artifact/download/stevendborrelli/rpm/vault-0.1.0-1.el7.centos.x86_64.rpm"
+    name: "https://bintray.com/artifact/download/ciscocloud/rpm/vault-0.1.2-1.el7.centos.x86_64.rpm"
     state: present
   tags:
     - vault
     - bootstrap
 
-- name: configure vault service
+- name: deploy tls files
   sudo: yes
   copy:
-    src: vault.service
-    dest: /usr/lib/systemd/system/vault.service
+    src: "{{ item.src }}"
+    dest: "{{ item.dest}}"
+  with_items:
+    - src: ssl/certs/vault.cert.pem
+      dest: /etc/vault/ssl/vault.cert
+    - src: ssl/private/vault.key.pem
+      dest: /etc/vault/ssl/vault.key
   notify:
     - restart vault
-  tags:
-    - vault
-
-- name: create vault directories
-  sudo: yes
-  file:
-    path: /etc/vault
-    state: directory
   tags:
     - vault
 
@@ -31,6 +28,8 @@
   template:
     src: vault.config.j2
     dest: /etc/vault/vault.config
+  notify:
+    - restart vault
   tags:
     - vault
 
@@ -39,14 +38,19 @@
   service:
     name: vault
     enabled: yes
-    state: started
+  tags: 
+    - vault
+
+- meta: flush_handlers
+
+- name: register vault service
+  sudo: yes
+  command: /usr/local/bin/vault-register-with-consul.sh
   tags:
     - vault
 
-- name: wait for vault port
-  wait_for:
-    port: 8200
+- name: bootstrap vault
+  sudo: yes
+  command: /usr/local/bin/vault-bootstrap.sh
   tags:
     - vault
-
-- include: bootstrap.yml
