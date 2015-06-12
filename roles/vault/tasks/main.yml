@@ -38,10 +38,9 @@
   service:
     name: vault
     enabled: yes
+    state: started
   tags: 
     - vault
-
-- meta: flush_handlers
 
 - name: register vault service
   sudo: yes
@@ -52,5 +51,9 @@
 - name: bootstrap vault
   sudo: yes
   command: /usr/local/bin/vault-bootstrap.sh
+  notify:
+    - restart vault
   tags:
     - vault
+
+- meta: flush_handlers
