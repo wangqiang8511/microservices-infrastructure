@@ -19,6 +19,13 @@
   when: hostvars[item].ansible_default_ipv4.address is defined
   with_items: groups['all']
 
+- name: enable EPEL repo
+  sudo: yes
+  yum:
+    name: epel-release
+    state: latest
+
+
 - name: install system utilities
   sudo: yes
   yum:
@@ -28,6 +35,7 @@
     - httpd-tools
     - nc
     - openssh
+    - jq
   tags:
     - bootstrap
 
@@ -37,12 +45,6 @@
     name: firewalld
     enabled: false
     state: stopped
-
-- name: enable EPEL repo
-  sudo: yes
-  yum:
-    name: epel-release
-    state: latest
 
 - name: install pip
   sudo: yes
