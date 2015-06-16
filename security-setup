@@ -367,9 +367,9 @@ class Component(object):
         yield
         os.chdir(original)
 
-    def call(self, command, stdin=None, visible_to_user=False):
+    def call(self, command, stdin=None, visible_to_user=False, env=None):
         capture = None if visible_to_user else PIPE
-        proc = Popen(shlex.split(command), stdin=capture, stdout=capture, stderr=capture)
+        proc = Popen(shlex.split(command), stdin=capture, stdout=capture, stderr=capture, env=env)
         stdout, stderr = proc.communicate(stdin)
         return proc.returncode, stdout, stderr
 
@@ -411,12 +411,16 @@ class Component(object):
         cert = posixpath.join(CERT_PATH, 'certs', name + '.cert.pem')
         common = getattr(self.args, name + '_location', name + '.service.consul')
 
+        env = {}
+	env['SAN'] = "DNS:localhost, DNS:%s, IP:127.0.0.1" % common
+
         with self.chdir(CERT_PATH):
             if posixpath.exists(key):
                 print('{} key already exists'.format(name))
             else:
                 self.wrap_call(
-                    'openssl genrsa -out {} 2048 -config ./openssl.cnf'.format(key)
+                    'openssl genrsa -out {} 2048 -config ./openssl-req.cnf'.format(key),
+                    env=env
                 )
                 os.chmod(key, stat.S_IRUSR | stat.S_IWUSR)
                 print('generated {} key'.format(name))
@@ -426,18 +430,18 @@ class Component(object):
             else:
                 # CSR
                 self.wrap_call(
-                    'openssl req -sha256 -new -subj "{}" -key {} -out {} -config ./openssl.cnf'.format(
+                    'openssl req -sha256 -new -subj "{}" -key {} -out {} -config ./openssl-req.cnf'.format(
                         self.openssl_subject(common), key, csr
-                    )
+                    ), env=env
                 )
                 print('generated {} CSR'.format(name))
 
                 # certificate
                 self.wrap_call(
                     'openssl ca -extensions usr_cert -notext -md sha256 '
-                    '-in {} -out {} -config ./openssl.cnf -batch'.format(
+                    '-in {} -out {} -config ./openssl-req.cnf -batch'.format(
                         csr, cert
-                    )
+                    ), env=env
                 )
                 os.chmod(
                     cert,
@@ -491,7 +495,7 @@ class Certificates(Component):
             else:
                 self.wrap_call(
                     'openssl req -new -x509 -extensions v3_ca -nodes -subj "{}" '
-                    '-keyout {} -out {} -days 365 -config ./openssl.cnf'.format(
+                    '-keyout {} -out {} -days 365 -config ./openssl-ca.cnf'.format(
                         self.openssl_subject("security-setup"), ROOT_KEY, ROOT_CERT
                     )
                 )
