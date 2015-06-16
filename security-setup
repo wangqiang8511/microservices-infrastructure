@@ -411,8 +411,7 @@ class Component(object):
         cert = posixpath.join(CERT_PATH, 'certs', name + '.cert.pem')
         common = getattr(self.args, name + '_location', name + '.service.consul')
 
-        env = {}
-	env['SAN'] = "DNS:localhost, DNS:%s, IP:127.0.0.1" % common
+        env = { 'SAN': "DNS:localhost, DNS:{}, IP:127.0.0.1".format(common) }
 
         with self.chdir(CERT_PATH):
             if posixpath.exists(key):
