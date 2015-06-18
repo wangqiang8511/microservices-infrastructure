@@ -527,7 +527,7 @@ class Nginx(Component):
 
 class Consul(Component):
     def check(self):
-        return [self.disable_security, self.gossip_key, self.master_acl_token, self.agent_acl_token, self.cert, self.default_acl_policy]
+        return [self.disable_security, self.gossip_key, self.master_acl_token, self.agent_acl_token, self.secure_acl_token, self.cert, self.default_acl_policy]
 
     def disable_security(self):
         "disable security"
@@ -561,6 +561,15 @@ class Consul(Component):
                 print('set acl agent token')
             else:
                 print('acl agent token already set')
+
+    def secure_acl_token(self):
+        "secure acl token"
+        with self.modify_security() as config:
+            if 'consul_acl_secure_token' not in config:
+                config['consul_acl_secure_token'] = str(uuid.uuid4())
+                print('set acl secure token')
+            else:
+                print('acl secure token already set')
 
     def cert(self):
         "SSL certificate"
