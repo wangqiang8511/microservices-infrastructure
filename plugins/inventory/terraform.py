@@ -168,6 +168,7 @@ def digitalocean_host(resource, tfvars=None):
         # generic
         'public_ipv4': raw_attrs['ipv4_address'],
         'private_ipv4': raw_attrs['ipv4_address'],
+        'provider': 'digitalocean',
     }
 
     # attrs specific to microservices-infrastructure
@@ -214,7 +215,7 @@ def openstack_host(resource, module_name):
         'security_groups': parse_list(raw_attrs, 'security_groups'),
         # ansible
         'ansible_ssh_port': 22,
-        'ansible_ssh_user': 'centos',
+        'ansible_ssh_user': raw_attrs.get('metadata.ssh_user', 'centos'),
         # workaround for an OpenStack bug where hosts have a different domain
         # after they're restarted
         'host_domain': 'novalocal',
@@ -222,6 +223,7 @@ def openstack_host(resource, module_name):
         # generic
         'public_ipv4': raw_attrs['access_ip_v4'],
         'private_ipv4': raw_attrs['access_ip_v4'],
+        'provider': 'openstack',
     }
 
     try:
@@ -274,7 +276,7 @@ def aws_host(resource, module_name):
         'public': parse_dict(raw_attrs, 'public',
                              sep='_'),
         'root_block_device': parse_attr_list(raw_attrs, 'root_block_device'),
-        'security_groups': parse_attr_list(raw_attrs, 'security_groups'),
+        'security_groups': parse_list(raw_attrs, 'security_groups'),
         'subnet': parse_dict(raw_attrs, 'subnet',
                              sep='_'),
         'tags': parse_dict(raw_attrs, 'tags'),
@@ -287,7 +289,8 @@ def aws_host(resource, module_name):
         'ansible_ssh_host': raw_attrs['public_ip'],
         # generic
         'public_ipv4': raw_attrs['public_ip'],
-        'private_ipv4': raw_attrs['private_ip']
+        'private_ipv4': raw_attrs['private_ip'],
+        'provider': 'aws',
     }
 
     # attrs specific to microservices-infrastructure
@@ -344,7 +347,8 @@ def gce_host(resource, module_name):
         'zone': raw_attrs['zone'],
         # ansible
         'ansible_ssh_port': 22,
-        'ansible_ssh_user': 'deploy',
+        'ansible_ssh_user': raw_attrs.get('metadata.ssh_user', 'centos'),
+        'provider': 'gce',
     }
 
     # attrs specific to microservices-infrastructure
@@ -396,6 +400,7 @@ def vsphere_host(resource, module_name):
         'ip_address': raw_attrs['ip_address'],
         'metadata': parse_dict(raw_attrs, 'configuration_parameters'),
         'ansible_ssh_port': 22,
+        'provider': 'vsphere',
     }
 
     try:
@@ -463,7 +468,6 @@ def main():
     default_root = os.environ.get('TERRAFORM_STATE_ROOT',
                                   os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                                '..', '..', )))
-
     parser.add_argument('--root',
                         default=default_root,
                         help='custom root to search for `.tfstate`s in')

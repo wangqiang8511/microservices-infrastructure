@@ -1,6 +1,26 @@
 Changelog
 =========
 
+0.3.1 (June 17, 2015)
+---------------------
+
+Features
+^^^^^^^^
+
+* Add Distributive system checker #434
+* Add Chronos role  #437
+* Add DigitalOcean terraform provider #449
+* Add VMware vSphere terraform provider #471
+* Support for terraform in Dockerfile #481
+
+Fixes
+^^^^^
+
+* Use default security group in OpenStack #477
+* Allow ``terraform.py`` to use configurable usernames #491
+* Change "disable security" to "check security" in ``security-setup`` #494
+* Stop logstash variables from showing up as a top-level component in docs #482
+
 0.3.0 (June 8, 2015)
 --------------------
 
