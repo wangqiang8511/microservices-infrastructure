@@ -1,3 +1,6 @@
 {
+{% if consul_is_server %}
+	"acl_default_policy": "{{ consul_acl_default_policy }}",
+{% endif %}
 	"acl_token": "{{ consul_acl_agent_token }}"
 }
