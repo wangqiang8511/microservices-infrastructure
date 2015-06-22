@@ -1,7 +1,10 @@
 ---
 - name: delete agent acl
   run_once: yes
-  command: curl -X PUT localhost:8500/v1/acl/destroy/{{ consul_acl_agent_token }}?token={{ consul_acl_master_token }}
+  command: consulacl destroy --token={{ consul_acl_master_token }} {{ item }}
+  with_items:
+    - "{{ consul_acl_agent_token }}"
+    - "{{ consul_acl_secure_token }}"
   notify:
     - restart consul
   tags:
