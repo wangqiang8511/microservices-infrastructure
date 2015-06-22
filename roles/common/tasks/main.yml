@@ -74,3 +74,5 @@
 
 - include: digitalocean.yml
   when: provider == 'digitalocean'
+
+- meta: flush_handlers
