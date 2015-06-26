@@ -143,18 +143,6 @@ cert_opts.add_argument(
     help='contact email for organizational unit'
 )
 cert_opts.add_argument(
-    '--consul-location', default='consul.service.consul',
-    help='internal name for Consul certificate, will be used as common name'
-)
-cert_opts.add_argument(
-    '--nginx-location', default='*.service.consul',
-    help='internal name for Nginx proxies, will be used as common name'
-)
-cert_opts.add_argument(
-    '--vault-location', default='vault.service.consul',
-    help='internal name for Vault certificate, will be used as common name'
-)
-cert_opts.add_argument(
     '--no-verify-certificates', action='store_true',
     help='skip verifying certificates as part of setup process'
 )
@@ -405,58 +393,6 @@ class Component(object):
             email=overrides.get('email', self.args.cert_email)
         )
 
-    def generate_certificate(self, name):
-        key = posixpath.join(CERT_PATH, 'private', name + '.key.pem')
-        csr = posixpath.join(CERT_PATH, 'certs', name + '.csr.pem')
-        cert = posixpath.join(CERT_PATH, 'certs', name + '.cert.pem')
-        common = getattr(self.args, name + '_location', name + '.service.consul')
-
-        env = { 'SAN': "DNS:localhost, DNS:{}, IP:127.0.0.1".format(common) }
-
-        with self.chdir(CERT_PATH):
-            if posixpath.exists(key):
-                print('{} key already exists'.format(name))
-            else:
-                self.wrap_call(
-                    'openssl genrsa -out {} 2048 -config ./openssl-req.cnf'.format(key),
-                    env=env
-                )
-                os.chmod(key, stat.S_IRUSR | stat.S_IWUSR)
-                print('generated {} key'.format(name))
-
-            if posixpath.exists(cert):
-                print('{} certificate already exists'.format(name))
-            else:
-                # CSR
-                self.wrap_call(
-                    'openssl req -sha256 -new -subj "{}" -key {} -out {} -config ./openssl-req.cnf'.format(
-                        self.openssl_subject(common), key, csr
-                    ), env=env
-                )
-                print('generated {} CSR'.format(name))
-
-                # certificate
-                self.wrap_call(
-                    'openssl ca -extensions usr_cert -notext -md sha256 '
-                    '-in {} -out {} -config ./openssl-req.cnf -batch'.format(
-                        csr, cert
-                    ), env=env
-                )
-                os.chmod(
-                    cert,
-                    stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH
-                )
-                print('generated {} certificate'.format(name))
-
-            # verify
-            if not self.args.no_verify_certificates:
-                status, out, err = self.wrap_call('openssl verify -CAfile {} {}'.format(ROOT_CERT, cert))
-                if out != '{}: OK\n'.format(cert):
-                    self.print_call_failure(status, out, err)
-                    sys.exit(1)
-
-                print('{} certificate is valid'.format(name))
-
     def toggle_boolean(self, inFlag, inValue, inDefault):
         with self.modify_security() as config:
             if inFlag not in config:
@@ -506,11 +442,7 @@ class Certificates(Component):
 
 class Nginx(Component):
     def check(self):
-        return [self.cert, self.password]
-
-    def cert(self):
-        "SSL certificate"
-        self.generate_certificate("nginx")
+        return [self.password]
 
     def password(self):
         "admin password"
@@ -527,7 +459,7 @@ class Nginx(Component):
 
 class Consul(Component):
     def check(self):
-        return [self.check_security, self.gossip_key, self.master_acl_token, self.agent_acl_token, self.secure_acl_token, self.cert, self.default_acl_policy]
+        return [self.check_security, self.gossip_key, self.master_acl_token, self.agent_acl_token, self.secure_acl_token, self.default_acl_policy]
 
     def check_security(self):
         "check security"
@@ -571,10 +503,6 @@ class Consul(Component):
             else:
                 print('acl secure token already set')
 
-    def cert(self):
-        "SSL certificate"
-        self.generate_certificate("consul")
-
     def default_acl_policy(self):
         "Default ACL policy"
         with self.modify_security() as config:
@@ -583,14 +511,6 @@ class Consul(Component):
                print('set consul_default_acl_policy')
             else:
                print('consul_default_acl_policy already set')
-
-class Vault(Component):
-    def check(self):
-        return [self.cert]
-
-    def cert(self):
-        "SSL certificate"
-        self.generate_certificate("vault")
 
 class Marathon(Component):
     def check(self):
