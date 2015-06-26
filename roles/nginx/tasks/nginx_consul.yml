@@ -1,0 +1,53 @@
+---
+- name: deploy nginx template 
+  sudo: yes
+  template:
+    src: consul.nginx.j2
+    dest: /etc/consul/consul.nginx
+  register:
+    nginx_template
+  tags:
+    - nginx
+
+- name: deploy nginx service
+  sudo: yes
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: nginx-consul.service.j2
+      dest: /usr/lib/systemd/system/nginx-consul.service
+    - src: nginx-consul.env.j2
+      dest: /etc/default/nginx-consul.env
+  notify:
+    - restart nginx-consul
+  tags:
+    - nginx
+
+- name: install nginx template
+  sudo: yes
+  command: consulkv write service/nginx/templates/consul @/etc/consul/consul.nginx
+  when: nginx_template.changed
+  tags:
+    - nginx
+
+- name: install nginx admin password
+  sudo: yes
+  run_once: yes
+  command: curl -X PUT -d '{{ nginx_admin_password_encrypted }}' localhost:8500/v1/kv/service/nginx/auth/users/admin
+  register: command_result
+  failed_when: "'true' not in command_result.stdout"
+  when: nginx_admin_password_encrypted is defined
+  tags:
+    - nginx
+    
+- name: enable nginx-consul
+  sudo: yes
+  service:
+    name: nginx-consul
+    enabled: yes
+    state: started
+  notify:
+    - restart nginx-consul
+  tags:
+    - nginx

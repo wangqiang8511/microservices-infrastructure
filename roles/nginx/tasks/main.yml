@@ -8,17 +8,11 @@
   tags:
     - nginx
 
-- name: deploy tls files
+- name: create tls files
   sudo: yes
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: u=r
-  with_items:
-    - src: ssl/certs/nginx.cert.pem
-      dest: /etc/nginx/ssl/nginx.cert
-    - src: ssl/private/nginx.key.pem
-      dest: /etc/nginx/ssl/nginx.key
+  command: /usr/local/bin/generate_certificate --location '*.service.{{ consul_dns_domain }}' --prefix nginx --destination /etc/nginx/ssl --dns '*.service.{{ consul_dns_domain }}'
+  args:
+    creates: /etc/nginx/ssl/nginx.key
   tags:
     - nginx
 
@@ -31,3 +25,5 @@
 - name: set admin password variable
   set_fact:
     nginx_admin_password_encrypted: "{{ nginx_admin_password_encrypted.stdout }}"
+
+- include: nginx_consul.yml
