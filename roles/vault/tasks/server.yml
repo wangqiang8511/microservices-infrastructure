@@ -1,0 +1,54 @@
+---
+- name: install vault
+  sudo: yes
+  yum:
+    name: "https://bintray.com/artifact/download/ciscocloud/rpm/vault-0.1.2-2.el7.centos.x86_64.rpm"
+    state: present
+  tags:
+    - vault
+    - bootstrap
+
+- name: create tls files
+  sudo: yes
+  command: /usr/local/bin/generate_certificate --location vault.service.{{ consul_dns_domain }} --dns vault.service.{{ consul_dns_domain }} --ip {{ ansible_default_ipv4.address }} --destination /etc/vault/ssl --prefix vault
+  args:
+    creates: /etc/vault/sll/vault.key
+  notify:
+    - restart vault
+  tags:
+    - vault
+
+- name: configure vault
+  sudo: yes
+  template:
+    src: vault.config.j2
+    dest: /etc/vault/vault.config
+  notify:
+    - restart vault
+  tags:
+    - vault
+
+- name: enable vault
+  sudo: yes
+  service:
+    name: vault
+    enabled: yes
+    state: started
+  tags: 
+    - vault
+
+- name: register vault service
+  sudo: yes
+  command: /usr/local/bin/vault-register-with-consul.sh
+  tags:
+    - vault
+
+- name: bootstrap vault
+  sudo: yes
+  command: /usr/local/bin/vault-bootstrap.sh
+  notify:
+    - restart vault
+  tags:
+    - vault
+
+- meta: flush_handlers
