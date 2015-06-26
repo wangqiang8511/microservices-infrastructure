@@ -51,18 +51,11 @@
   tags:
     - consul
 
-- name: deploy tls files
+- name: create tls files
   sudo: yes
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-  with_items:
-    - src: ssl/cacert.pem
-      dest: /etc/consul/ssl/{{ consul_ca_file }}
-    - src: ssl/certs/consul.cert.pem
-      dest: /etc/consul/ssl/{{ consul_cert_file }}
-    - src: ssl/private/consul.key.pem
-      dest: /etc/consul/ssl/{{ consul_key_file }}
+l command: /usr/local/bin/generate_certificate --location consul.service.{{ consul_dns_domain }} --dns consul.service.{{ consul_dns_domain }} --destination /etc/consul/ssl --prefix consul
+  args:
+    creates: /etc/consul/ssl/consul.key
   notify:
     - restart consul
   tags:
@@ -125,8 +118,6 @@
   when: not do_consul_acl
 
 - meta: flush_handlers
-
-- include: nginx_proxy.yml
 
 # install distributive, register checks, and run check on provisioning
 - include: distributive.yml
