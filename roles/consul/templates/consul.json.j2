@@ -14,7 +14,7 @@
 {% if consul_gossip_key is defined %}
   "encrypt": "{{ consul_gossip_key }}",
 {% endif %}
-  "ca_file": "/etc/consul/ssl/{{ consul_ca_file }}",
+  "ca_file": "/etc/pki/CA/cacert.pem",
   "cert_file": "/etc/consul/ssl/{{ consul_cert_file }}",
   "key_file": "/etc/consul/ssl/{{ consul_key_file }}",
   "verify_incoming": true,
