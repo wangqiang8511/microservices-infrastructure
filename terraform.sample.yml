@@ -32,14 +32,16 @@
     consul_servers_group: role=control
   roles:
     - common
+    - ssl
     - collectd
     - logrotate
     - consul-template
     - docker
     - logstash
-    - nginx
     - consul
+    - nginx
     - dnsmasq
+    - vault
 
 # ROLES - after provisioning the software that's common to all hosts, we do
 # specialized hosts. This configuration has two major groups: control nodes and
@@ -76,7 +78,6 @@
     mesos_mode: leader
     zookeeper_server_group: role=control
   roles:
-    - vault
     - zookeeper
     - mesos
     - marathon

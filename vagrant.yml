@@ -13,14 +13,15 @@
     provider: vagrant
   roles:
     - common
+    - ssl
     - collectd
     - logrotate
     - consul-template
     - docker
-    - dnsmasq
-    - nginx
     - consul
+    - nginx
     - logstash
+    - dnsmasq
     - vault
     - zookeeper
     - mesos
