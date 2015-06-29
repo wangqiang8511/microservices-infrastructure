@@ -53,7 +53,7 @@
 
 - name: create tls files
   sudo: yes
-l command: /usr/local/bin/generate_certificate --location consul.service.{{ consul_dns_domain }} --dns consul.service.{{ consul_dns_domain }} --destination /etc/consul/ssl --prefix consul
+  command: /usr/local/bin/generate_certificate --location consul.service.{{ consul_dns_domain }} --dns consul.service.{{ consul_dns_domain }} --destination /etc/consul/ssl --prefix consul
   args:
     creates: /etc/consul/ssl/consul.key
   notify:
