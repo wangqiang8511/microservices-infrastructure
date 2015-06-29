@@ -33,3 +33,5 @@
       mode: u=rwx
   tags:
     - ssl
+
+- meta: flush_handlers
