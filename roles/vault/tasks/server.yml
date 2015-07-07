@@ -12,7 +12,7 @@
   sudo: yes
   command: /usr/local/bin/generate_certificate --location vault.service.{{ consul_dns_domain }} --dns vault.service.{{ consul_dns_domain }} --ip {{ ansible_default_ipv4.address }} --destination /etc/vault/ssl --prefix vault
   args:
-    creates: /etc/vault/sll/vault.key
+    creates: /etc/vault/ssl/vault.key
   notify:
     - restart vault
   tags:
