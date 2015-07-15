@@ -1,0 +1,37 @@
+---
+- name: deploy root ca
+  sudo: yes
+  copy:
+    src: ssl/cacert.pem
+    dest: /etc/pki/ca-trust/source/anchors/cacert.pem
+    owner: root
+  notify:
+    - update-ca-trust
+  tags:
+    - ssl
+
+- name: configure ca environment
+  sudo: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode | default('u=rw,g=r,o=r') }}"
+    owner: root
+  with_items:
+    - src: openssl-req.cnf
+      dest: /etc/pki/CA
+    - src: index.txt
+      dest: /etc/pki/CA
+    - src: serial
+      dest: /etc/pki/CA
+    - src: ssl/cacert.pem
+      dest: /etc/pki/CA
+    - src: ssl/private/cakey.pem
+      dest: /etc/pki/CA/private
+    - src: generate_certificate
+      dest: /usr/local/bin
+      mode: u=rwx
+  tags:
+    - ssl
+
+- meta: flush_handlers

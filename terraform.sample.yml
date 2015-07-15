@@ -32,6 +32,7 @@
     consul_servers_group: role=control
   roles:
     - common
+    - ssl
     - collectd
     - logrotate
     - consul-template
