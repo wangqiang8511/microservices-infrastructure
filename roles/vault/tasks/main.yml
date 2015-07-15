@@ -8,6 +8,25 @@
     - vault
     - bootstrap
 
+- name: create tls directory structure
+  sudo: yes
+  file:
+    path: /etc/vault/ssl
+    state: directory
+    mode: 0700
+  tags:
+    - vault
+
+- name: create tls files
+  sudo: yes
+  command: /usr/local/bin/generate_certificate --location vault.service.{{ consul_dns_domain }} --dns vault.service.{{ consul_dns_domain }} --ip {{ ansible_default_ipv4.address }} --destination /etc/vault/ssl --prefix vault
+  args:
+    creates: /etc/vault/ssl/vault.key
+  notify:
+    - restart vault
+  tags:
+    - vault
+
 - name: configure vault service
   sudo: yes
   copy:
