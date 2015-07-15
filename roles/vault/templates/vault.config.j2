@@ -8,6 +8,7 @@ backend "consul" {
 
 listener "tcp" {
 	address = "127.0.0.1:8200"
-	tls_cert_file = "/etc/consul/ssl/consul.cert"
-	tls_key_file = "/etc/consul/ssl/consul.key"
+	tls_cert_file = "/etc/vault/ssl/vault.cert"
+	tls_key_file = "/etc/vault/ssl/vault.key"
+	advertise_addr = "https://{{ ansible_default_ipv4.address }}"
 }
