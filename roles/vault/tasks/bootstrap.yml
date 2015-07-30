@@ -48,6 +48,7 @@
     line: 'vault_root_token: {{ vault_token }}'
     regexp: '^vault_root_token:.*'
     insertbefore: "^zk_marathon_user:"
+    state: present
   tags:
     - vault
 

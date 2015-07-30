@@ -69,3 +69,5 @@
     - vault
 
 - include: bootstrap.yml
+
+- include: distributive.yml
