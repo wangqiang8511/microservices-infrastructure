@@ -12,8 +12,12 @@
       ]
     }
   },
+  "labels": {
+    "check_http": "http://{host}:{port}",
+    "check_interval": "10s"
+  },
   "id": "hello-world",
-  "instances": 2,
+  "instances": 1,
   "cpus": 0.1,
   "mem": 128
 }
