@@ -23,9 +23,11 @@
     - dnsmasq
     - nginx
     - consul
+    - etcd
     - logstash
     - vault
     - zookeeper
+    - calico
     - mesos
     - marathon
     - chronos
