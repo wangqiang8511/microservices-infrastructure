@@ -19,10 +19,12 @@ server=/{{ consul_dns_domain }}/{{ hostvars[host].private_ipv4 }}#8600
 {% endif %}
 {% endfor %}
 
-{% if ansible_domain is defined and ansible_domain != '' %}
+{% for domain in domain_search_list | unique %}
+{% if domain != consul_dns_domain %}
 {% for nameserver in nameservers | unique %}
 {% if nameserver != '127.0.0.1' %}
-server=/{{ ansible_domain }}/{{ nameserver }}
+server=/{{ domain }}/{{ nameserver }}
 {% endif %}
 {% endfor %}
 {% endif %}
+{% endfor %}
