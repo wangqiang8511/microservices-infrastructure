@@ -39,6 +39,22 @@
     - nc
     - openssh
     - policycoreutils-python
+    - unzip
+    - java-1.8.0-openjdk
+  tags:
+    - bootstrap
+
+- name: set JAVA_HOME
+  sudo: yes
+  copy:
+    src: java_env
+    dest: /etc/profile.d/{{item}}
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - java.sh
+    - java.csh
   tags:
     - bootstrap
 
