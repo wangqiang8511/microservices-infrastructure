@@ -161,6 +161,13 @@ resource "aws_security_group" "control" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress { # Mantl API
+    from_port = 4002
+    to_port = 4002
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   ingress { # Consul
     from_port = 8500
     to_port = 8500

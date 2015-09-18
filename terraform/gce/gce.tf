@@ -35,6 +35,7 @@ resource "google_compute_firewall" "mi-firewall-external" {
       "3389", # RDP
       "80",   # HTTP
       "443",  # HTTPs
+      "4002", # Mantl API
       "4400", # Chronos
       "5050", # Mesos
       "8080", # Marathon
