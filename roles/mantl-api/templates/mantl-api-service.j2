@@ -16,7 +16,6 @@ ExecStart=/usr/bin/docker run \
     --name={{ mantl_api_container_name }} \
     {{ mantl_api_ports }} \
     --env-file=/etc/default/mantl-api \
-    --volume=/etc/mesos:/etc/mesos \
     --volume=/etc/consul/ssl/:/usr/local/share/ca-certificates/:ro \
     {{ mantl_api_image }}:{{ mantl_api_image_tag }}
 
