@@ -5,4 +5,5 @@ MANTL_API_MARATHON=http://marathon.service.{{ consul_dns_domain }}:{{ marathon_p
 MANTL_API_MESOS=http://leader.mesos.service.{{ consul_dns_domain }}:{{ mesos_leader_port }}
 MANTL_API_MESOS_USER={{ mantl_api_principal }}
 MANTL_API_MESOS_PASSWORD="{{ mantl_api_secret }}"
+MANTL_API_MESOS_PRINCIPAL={{ mantl_api_principal }}
 MANTL_API_ZOOKEEPER={{ zookeeper_service }}.service.{{ consul_dns_domain }}:2181
