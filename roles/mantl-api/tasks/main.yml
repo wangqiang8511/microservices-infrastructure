@@ -1,0 +1,80 @@
+- name: generate default env file
+  sudo: yes
+  template:
+    src: mantl-api-env.j2
+    dest: "/etc/default/mantl-api"
+  notify:
+    - restart mantl-api
+  tags:
+    - mantl-api
+
+- name: generate systemd service file
+  sudo: yes
+  template:
+    src: mantl-api-service.j2
+    dest: "/usr/lib/systemd/system/mantl-api.service"
+  notify:
+    - register mantl-api service
+    - reload systemd daemon
+  tags:
+    - mantl-api
+
+- name: ensure mantl-api docker image is present
+  sudo: yes
+  command: docker pull {{ mantl_api_image }}:{{ mantl_api_image_tag }}
+  tags:
+    - mantl-api
+
+- name: ensure /etc/mantl-api exists
+  sudo: yes
+  file:
+    path: /etc/mantl-api
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - mantl-api
+
+- name: copy nginx configuration
+  sudo: yes
+  template:
+    src: mantl-api.nginx.j2
+    dest: /etc/mantl-api/mantl-api.nginx
+  notify:
+    - restart nginx-mantl-api
+  tags:
+    - mantl-api
+
+- name: configure nginx
+  sudo: yes
+  command: consul-cli kv-write service/nginx/templates/mantl-api @/etc/mantl-api/mantl-api.nginx
+  tags:
+    - mantl-api
+
+- name: configure nginx-mantl-api
+  sudo: yes
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - src: nginx-mantl-api.service.j2
+      dest: /usr/lib/systemd/system/nginx-mantl-api.service
+    - src: nginx-mantl-api.env.j2
+      dest: /etc/default/nginx-mantl-api.env
+  notify:
+    - reload systemd daemon
+    - restart nginx-mantl-api
+  tags:
+    - mantl-api
+
+- name: enable nginx-mantl-api
+  sudo: yes
+  service:
+    name: nginx-mantl-api
+    enabled: yes
+    state: started
+  notify:
+    - restart nginx-mantl-api
+  tags:
+    - mantl-api

@@ -1,0 +1,7 @@
+---
+mantl_api_image: "ryane/mantl-api"
+mantl_api_image_tag: 0.1
+mantl_api_container_name: "mantl-api"
+mantl_api_port: "4001"
+mantl_api_ports: "-p 4001:4001"
+mantl_api_proxy_port: "4002"

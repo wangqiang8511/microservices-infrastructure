@@ -1,0 +1,29 @@
+---
+- name: reload systemd daemon
+  sudo: yes
+  command: systemctl daemon-reload
+  tags: 
+    - mantl-api
+
+- name: register mantl-api service
+  sudo: yes 
+  service:  
+    enabled: yes 
+    name: "mantl-api"  
+    state: started 
+  tags:  
+    - mantl-api  
+
+- name: restart mantl-api
+  sudo: yes
+  service:
+    name: "mantl-api"
+    state: restarted
+  tags:
+    - mantl-api
+
+- name: restart nginx-mantl-api
+  sudo: yes
+  command: systemctl restart nginx-mantl-api
+  tags:
+    - mantl-api

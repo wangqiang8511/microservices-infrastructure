@@ -1,0 +1,28 @@
+[Unit]
+Description=Mantl API
+After=docker.service
+Requires=docker.service
+Requires=dnsmasq.service
+
+[Service]
+Restart=on-failure
+RestartSec=20
+TimeoutStartSec=20m
+
+ExecStartPre=-/usr/bin/docker rm {{ mantl_api_container_name }}
+ExecStartPre=-/usr/bin/docker pull {{ mantl_api_image }}:{{ mantl_api_image_tag }}
+
+ExecStart=/usr/bin/docker run \
+    --name={{ mantl_api_container_name }} \
+    {{ mantl_api_ports }} \
+    --env-file=/etc/default/mantl-api \
+    --volume=/etc/mesos:/etc/mesos \
+    --volume=/etc/consul/ssl/:/usr/local/share/ca-certificates/:ro \
+    {{ mantl_api_image }}:{{ mantl_api_image_tag }}
+
+ExecStop=/bin/bash -c " \
+    /usr/bin/docker kill {{ mantl_api_container_name }} && \
+    /usr/bin/docker rm {{ mantl_api_container_name }}"
+
+[Install]
+WantedBy=multi-user.target
