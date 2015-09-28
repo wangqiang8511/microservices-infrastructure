@@ -1,0 +1,44 @@
+---
+# some created directories may be redundant, but are kept in case anything else
+# changes, and to enable the picking and choosing of components/roles.
+- name: create consul configuration directory
+  sudo: yes
+  file:
+    path: /etc/consul
+    state: directory
+    mode: 0770
+  tags:
+    - consul
+    - distributive
+    - etcd
+
+- name: create symlink to distributive etcd checklist
+  sudo: yes
+  file:
+    state: link
+    src: /usr/share/distributive/etcd.json
+    dest: /etc/distributive.d/etcd.json
+  tags:
+    - consul
+    - distributive
+    - etcd
+
+- name: register distributive tests with consul
+  sudo: yes
+  copy:
+    src: distributive-etcd-check.json
+    dest: /etc/consul/
+  notify:
+    - reload consul
+  tags:
+    - consul
+    - distributive
+    - etcd
+
+- name: run distributive etcd test
+  sudo: yes
+  command: /usr/bin/distributive -f /etc/distributive.d/etcd.json -d "" --verbosity="info"
+  tags:
+    - consul
+    - distributive
+    - etcd

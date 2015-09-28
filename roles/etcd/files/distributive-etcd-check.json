@@ -1,0 +1,11 @@
+{
+    "check": {
+        "id": "distributive-etcd-checks",
+        "name": "Distributive etcd Health Checks",
+        "service_id": "etcd",
+        "script": "/bin/distributive -f /etc/distributive.d/etcd.json -d '' --verbosity=info",
+        "status": "passing",
+        "interval": "1m",
+        "timeout": "5s"
+    }
+}
