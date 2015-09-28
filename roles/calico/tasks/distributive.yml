@@ -1,0 +1,44 @@
+---
+# some created directories may be redundant, but are kept in case anything else
+# changes, and to enable the picking and choosing of components/roles.
+- name: create consul configuration directory
+  sudo: yes
+  file:
+    path: /etc/consul
+    state: directory
+    mode: 0770
+  tags:
+    - consul
+    - distributive
+    - calico
+
+- name: create symlink to distributive calico checklist
+  sudo: yes
+  file:
+    state: link
+    src: /usr/share/distributive/calico.json
+    dest: /etc/distributive.d/calico.json
+  tags:
+    - consul
+    - distributive
+    - calico
+
+- name: register distributive tests with consul
+  sudo: yes
+  copy:
+    src: distributive-calico-check.json
+    dest: /etc/consul/
+  notify:
+    - reload consul
+  tags:
+    - consul
+    - distributive
+    - calico
+
+- name: run distributive calico test
+  sudo: yes
+  command: /usr/bin/distributive -f /etc/distributive.d/calico.json -d "" --verbosity="info"
+  tags:
+    - consul
+    - distributive
+    - calico

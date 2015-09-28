@@ -1,0 +1,11 @@
+{
+    "check": {
+        "id": "distributive-calico-checks",
+        "name": "Distributive Calico Health Checks",
+        "service_id": "calico",
+        "script": "/bin/distributive -f /etc/distributive.d/calico.json -d '' --verbosity=info",
+        "status": "passing",
+        "interval": "1m",
+        "timeout": "5s"
+    }
+}
