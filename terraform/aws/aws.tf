@@ -119,7 +119,7 @@ resource "aws_instance" "mi-worker-nodes" {
 
   key_name = "${aws_key_pair.deployer.key_name}"
 
-  iam_instance_profile = "${var.instance_iam_profile}"
+  iam_instance_profile = "${var.worker_iam_profile}"
 
   associate_public_ip_address=true
 
