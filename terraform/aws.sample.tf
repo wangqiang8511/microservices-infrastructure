@@ -13,6 +13,8 @@ module "aws-dc" {
   source_ami = "ami-96a818fe"
   control_count = 3
   worker_count = 3
+  control_iam_profile = "some_profile"
+  worker_iam_profile = "some_profile"
 }
 
 # Example setup for DNS with dnsimple;
