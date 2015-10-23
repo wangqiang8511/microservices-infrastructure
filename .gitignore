@@ -9,3 +9,8 @@ ssl/serial*
 # terraform
 **/*.tfstate*
 **/.terraform
+bin/
+include/
+lib/
+local/
+pip-selfcheck.json
