@@ -14,7 +14,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: "^{{ hostvars[item].private_ipv4 }} {{ item }}{% if use_host_domain %} {{ item }}.{{ host_domain }}{% endif %}$"
-    line: "{{ hostvars[item].private_ipv4 }} {{ item }}{% if use_host_domain %} {{ item }}.{{ host_domain}}{% endif %}"
+    line: "{{ hostvars[item].private_ipv4 }} {% if use_host_domain %}{{ item }}.{{ host_domain }}{% endif %} {{ item }}"
     state: present
   when: hostvars[item].private_ipv4 is defined
   with_items: groups['all']
@@ -39,6 +39,10 @@
   sudo: yes
   shell: "ulimit -n {{ ulimit_nofile }}" 
   when: ulimit_change|changed
+
+-name: change hostname
+  sudo: yes
+  hostname: "name={{ inventory_hostname }}{% if use_host_domain %}.{{ host_domain }}{% endif %}"
 
 - name: install system utilities
   sudo: yes
