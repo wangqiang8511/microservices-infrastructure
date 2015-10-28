@@ -40,7 +40,7 @@
   shell: "ulimit -n {{ ulimit_nofile }}" 
   when: ulimit_change|changed
 
--name: change hostname
+- name: change hostname
   sudo: yes
   hostname: "name={{ inventory_hostname }}{% if use_host_domain %}.{{ host_domain }}{% endif %}"
 
