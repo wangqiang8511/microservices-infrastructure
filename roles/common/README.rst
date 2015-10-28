@@ -28,3 +28,9 @@ Variables
    The domain component to add to hosts in /etc/hosts
 
    default: ``novalocal``
+
+.. data:: ulimit_nofile 
+
+   Change the ulimit settings for all users with the defined value
+
+   default: ``1024``
