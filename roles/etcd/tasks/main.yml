@@ -1,14 +1,25 @@
 ---
 - name: check etcd status file
-  stat: path=/etc/etcd.status
+  stat: path=/etc/sysconfig/etcd
   sudo: yes
-  register: etcd_status_file
+  register: etcd_config_file
   tags:
     - etcd
 
 - name: set etcd status env
   set_fact: etcd_status="existing"
-  when: etcd_status_file.stat.islnk is defined
+  when: etcd_config_file.stat.islnk is defined
+  tags:
+    - etcd
+
+- name: add etcd env file
+  sudo: yes
+  tempate: 
+    src: etcd.sysconfig.j2
+    dest: /etc/sysconfig/etcd
+    owner: root
+    group: root
+    mode: 0644
   tags:
     - etcd
 
@@ -25,9 +36,6 @@
     - restart etcd
   tags:
     - etcd
-
-- name: add etcd status file
-  file: path=/etcd/etcd.status state=touch
 
 - name: install consul check script
   sudo: yes

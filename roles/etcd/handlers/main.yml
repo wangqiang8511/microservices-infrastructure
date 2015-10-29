@@ -4,3 +4,17 @@
   service:
     name: etcd
     state: restarted
+
+- name: set up existing
+  set_fact: etcd_status="existing"
+
+- name: add etcd env file
+  sudo: yes
+  tempate: 
+    src: etcd.sysconfig.j2
+    dest: /etc/sysconfig/etcd
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - etcd
