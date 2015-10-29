@@ -13,7 +13,7 @@
   sudo: yes
   lineinfile:
     dest: /etc/hosts
-    regexp: "^{{ hostvars[item].private_ipv4 }} {{ item }}{% if use_host_domain %} {{ item }}.{{ host_domain }}{% endif %}$"
+    regexp: "^{{ hostvars[item].private_ipv4 }} {% if use_host_domain %}{{ item }}.{{ host_domain }}{% endif %} {{ item }}$"
     line: "{{ hostvars[item].private_ipv4 }} {% if use_host_domain %}{{ item }}.{{ host_domain }}{% endif %} {{ item }}"
     state: present
   when: hostvars[item].private_ipv4 is defined
